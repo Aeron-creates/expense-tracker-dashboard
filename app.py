@@ -5,13 +5,48 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-DB_PATH = Path(__file__).parent / "expenses.db"
-
 st.set_page_config(
     page_title="Expense Dashboard",
     page_icon="💰",
     layout="wide",
 )
+
+DB_PATH = Path(__file__).parent / "expenses.db"
+
+def initialize_demo_database():
+    if DB_PATH.exists():
+        return
+
+    demo_expenses = [
+        ("Breakfast", 60, "Food", "2026-10-14"),
+        ("Bus fare", 40, "Transport", "2026-10-14"),
+        ("Lunch", 120, "Food", "2026-10-15"),
+        ("Notebook", 75, "Education", "2026-10-15"),
+        ("Mobile recharge", 199, "Bills", "2026-10-15"),
+        ("Dinner", 100, "Food", "2026-10-16"),
+        ("Auto fare", 90, "Transport", "2026-10-16"),
+    ]
+
+    with sqlite3.connect(DB_PATH) as connection:
+        connection.execute("""
+            CREATE TABLE expenses (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                amount REAL NOT NULL,
+                category TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            )
+        """)
+
+        connection.executemany("""
+            INSERT INTO expenses (name, amount, category, created_at)
+            VALUES (?, ?, ?, ?)
+        """, demo_expenses)
+
+    st.cache_data.clear()
+
+
+initialize_demo_database()
 
 st.title("💰 Personal Expense Dashboard")
 st.caption("Track spending. Understand your habits.")
