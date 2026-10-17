@@ -1,0 +1,13 @@
+# SQLite databases — never upload personal records
+*.db
+*.sqlite
+*.sqlite3
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Local environment and secrets
+.env
+.venv/
+venv/
